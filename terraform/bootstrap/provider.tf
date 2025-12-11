@@ -24,7 +24,7 @@ provider "cloudflare" {
 resource "cloudflare_dns_record" "ecs" {
   count = 4
   name = "ecs"
-  zone_id = "6288cfd9804cc5a0854c0dd10d1de92a"
+  zone_id = var.zone_id
   ttl     = "600"
   type    = "NS"
   content = module.route53.nameservers[count.index]
