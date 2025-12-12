@@ -1,22 +1,35 @@
-# Stage 1: Build with Python 3.11 (matches distroless)
-FROM python:3.11-bullseye AS builder
+FROM python:3.11-slim
 
-WORKDIR /build
+WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-COPY src/ ./src/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Stage 2: Minimal runtime with distroless
-FROM gcr.io/distroless/python3-debian12
+COPY . .
 
-ENV PYTHONPATH=/app:/install/lib/python3.11/site-packages \
-    PYTHONUNBUFFERED=1
-WORKDIR /app
-COPY --from=builder /install/lib/python3.11/site-packages /install/lib/python3.11/site-packages
-COPY --from=builder /build/src /app
-USER nonroot
 EXPOSE 8080
 
-CMD ["python", "-m", "uvicorn", "main:app", "--host=0.0.0.0", "--port=8080"]
+CMD ["python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]
+
+# ## Build Stage
+# FROM python:3.11-slim AS build 
+# WORKDIR /app
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+# COPY . .
+
+# ## Runtime Stage
+# FROM gcr.io/distroless/python3-debian12
+# WORKDIR /app
+
+# ## Distroless inherits Debian’s configuration, so its Python does not automatically search site-packages
+# ENV PYTHONPATH=/usr/local/lib/python3.11/site-packages
+# COPY --from=build /install /usr/local
+# COPY --from=build /app /app
+
+# ## Special non-root user contianed in distroless and Google container images
+# USER 65532:65532
+
+# EXPOSE 8080
+# CMD ["-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]
