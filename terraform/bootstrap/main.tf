@@ -12,4 +12,5 @@ module "ecr" {
 
 module "iam" {
   source = "./modules/iam"
+  admin_policy_arn = var.admin_policy_arn
 }

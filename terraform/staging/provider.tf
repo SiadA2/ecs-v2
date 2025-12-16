@@ -9,12 +9,12 @@ terraform {
   }
 
   backend "s3" {
-    bucket       = "eks-state-siad"
+    bucket       = "ecs-state-siad-staging"
     key          = "terraform.tfstate"
     region       = "eu-west-2"
     use_lockfile = true
     encrypt      = true
-    # enabled versioning on the console
+    # enabled versioning 
   }
 }
 

@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "oidc" {
 
     condition {
       test     = "StringLike"
-      values   = ["SiadA2:ecs-v2/*"]
+      values   = ["repo:SiadA2/ecs-v2:ref:refs/heads/main"]
       variable = "token.actions.githubusercontent.com:sub"
     }
   }
@@ -34,4 +34,9 @@ data "aws_iam_policy_document" "oidc" {
 resource "aws_iam_role" "this" {
   name               = "github_oidc_role"
   assume_role_policy = data.aws_iam_policy_document.oidc.json
+}
+
+resource "aws_iam_role_policy_attachment" "test-attach" {
+  role       = aws_iam_role.this.name
+  policy_arn = var.admin_policy_arn
 }

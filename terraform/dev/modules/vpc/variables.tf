@@ -1,0 +1,2 @@
+variable "az_count" {
+}
