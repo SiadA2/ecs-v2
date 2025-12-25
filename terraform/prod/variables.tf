@@ -12,12 +12,16 @@ variable "https_port" {
 }
 
 variable "domain_name" {
-  type    = string
-  default = "tm.nginxsiad.com"
+  type = string
 }
 
 variable "app_port" {
-  description = "Port exposed by the docker image to redirect traffic to"
-  type        = number
-  default     = 3000
+  type = number
+}
+
+variable "app_count" {
+}
+
+variable "dynamodb_tablename" {
+  type = string
 }
