@@ -3,8 +3,8 @@ data "aws_route53_zone" "primary" {
   name = var.domain_name
 }
 
-# Create an A (Alias) record to map tm.nginxsiad.com to the alb's dns name
-resource "aws_route53_record" "tm" {
+# Create an A (Alias) record to map ecs.nginxsiad.com to the alb's dns name
+resource "aws_route53_record" "ecs" {
   zone_id = data.aws_route53_zone.primary.id
   name    = var.domain_name
   type    = "A"
@@ -15,3 +15,4 @@ resource "aws_route53_record" "tm" {
     evaluate_target_health = true
   }
 }
+
