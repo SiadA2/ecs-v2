@@ -1,10 +1,8 @@
-name: Push to Amazon ECR
+name: Deploy to staging/testing
 
 on:
-  push:
-    branches: ['main']
-    paths: 
-      - app/*
+  pull_request:
+    branches: [main]
 
 permissions: 
   id-token: write
@@ -35,15 +33,15 @@ jobs:
       id: build-image
       run: |
         cd app
-        docker build -t siada2/ecs .
-        docker tag siada2/ecs:latest ${{ secrets.IMAGE_TAG }}
+        docker build -t ${{ secrets.STAGING_REPO }} .
+        docker tag ${{ secrets.STAGING_REPO }}:latest ${{ secrets.STAGING_TAG }}
         
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
-        image-ref: ${{ secrets.IMAGE_TAG }}
+        image-ref: ${{ secrets.STAGING_TAG }}
 
     - name: Push to Amazon ECR
       run: |
-        docker push ${{ secrets.IMAGE_TAG }}
+        docker push ${{ secrets.STAGING_TAG }}

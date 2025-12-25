@@ -1,0 +1,43 @@
+name: Push to Prod
+
+on:
+  push:
+    branches: ['main']
+    paths: 
+      - app/*
+
+permissions: 
+  id-token: write
+  contents: read    
+
+env:
+  AWS_REGION: eu-west-2                       
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials w/ OIDC
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{ secrets.ECR_ARN }}
+        aws-region: eu-west-2
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and tag image 
+      id: build-image
+      run: |
+        cd app
+        docker build -t ${{ secrets.PROD_REPO }} .
+        docker tag ${{ secrets.PROD_REPO }}:latest ${{ secrets.PROD_TAG }}
+
+    - name: Push to Amazon ECR
+      run: |
+        docker push ${{ secrets.PROD_TAG }}
