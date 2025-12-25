@@ -1,11 +1,15 @@
-resource "aws_dynamodb_table" "url_storage" {
+resource "aws_dynamodb_table" "main" {
   name         = var.dynamodb_tablename
   billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
 
-  hash_key = "UserId"
   attribute {
-    name = "UserId"
+    name = "id"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
 
