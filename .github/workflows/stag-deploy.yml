@@ -45,3 +45,28 @@ jobs:
     - name: Push to Amazon ECR
       run: |
         docker push ${{ secrets.STAGING_TAG }}
+
+  terraform-apply:
+    runs-on: ubuntu-24.04
+
+    steps:
+
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Configure AWS credentials w/ OIDC
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            role-to-assume: ${{ secrets.ADMIN_ARN }}
+            aws-region: ${{ env.AWS_REGION }}
+
+        - name: Run checkov scan
+          uses: bridgecrewio/checkov-action@v12
+
+        - name: Terraform apply
+          run: |
+            cd terraform/dev
+            terraform destroy --auto-approve -var-file="dev.tfvars"
+            ../staging
+            terraform init 
+            terraform apply --auto-approve -var-file="staging.tfvars" 
