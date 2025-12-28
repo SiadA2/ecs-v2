@@ -22,7 +22,7 @@ jobs:
     - name: Configure AWS credentials w/ OIDC
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        role-to-assume: ${{ secrets.ECR_ARN }}
+        role-to-assume: 
         aws-region: eu-west-2
     
     - name: Login to Amazon ECR
@@ -33,18 +33,18 @@ jobs:
       id: build-image
       run: |
         cd app
-        docker build -t ${{ secrets.STAGING_REPO }} .
-        docker tag ${{ secrets.STAGING_REPO }}:latest ${{ secrets.STAGING_TAG }}
+        docker build -t  .
+        docker tag 
         
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
-        image-ref: ${{ secrets.STAGING_TAG }}
+        image-ref: 
 
     - name: Push to Amazon ECR
       run: |
-        docker push ${{ secrets.STAGING_TAG }}
+        docker push 
 
   terraform-apply:
     runs-on: ubuntu-24.04
@@ -57,7 +57,7 @@ jobs:
         - name: Configure AWS credentials w/ OIDC
           uses: aws-actions/configure-aws-credentials@v2
           with:
-            role-to-assume: ${{ secrets.ADMIN_ARN }}
+            role-to-assume: ${{ secrets.ADMIN_ROLE_ARN }}
             aws-region: ${{ env.AWS_REGION }}
 
         - name: Run checkov scan
@@ -65,8 +65,6 @@ jobs:
 
         - name: Terraform apply
           run: |
-            cd terraform/dev
-            terraform destroy --auto-approve -var-file="dev.tfvars"
-            ../staging
+            cd terraform/staging
             terraform init 
             terraform apply --auto-approve -var-file="staging.tfvars" 

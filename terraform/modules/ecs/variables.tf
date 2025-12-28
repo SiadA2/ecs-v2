@@ -1,6 +1,5 @@
 variable "app_image" {
     description = "Docker image to run in the ECS cluster"
-    default = "338235305910.dkr.ecr.eu-west-2.amazonaws.com/siada2/ecs:latest"
 }
 
 variable "app_port" {
@@ -45,4 +44,8 @@ variable "ddb_table_name" {
 }
 
 variable "private_subnets_id" {
+}
+
+variable "environment" {
+    type        = string
 }

@@ -17,7 +17,7 @@
 
 This is an end-to-end, multi-cloud deployment of a URL-shortener. This URL-shortener takes a long url, shortens it and stores the shortened url in DynamoDB to be reused. 
 
-It runs on AWS Fargate, deployed via blue/green. 
+It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy.
 
 
 ## Key features
@@ -27,13 +27,7 @@ It runs on AWS Fargate, deployed via blue/green.
 - **Open ID Connect (OIDC):** Replaces long-lived access keys and removes the risk of credential-based attacks. Also enforces privellege of least-access.
 - **Cloud-native DNS:** Root domain handled by CloudFlare with subdomain delegation to Amazon Route 53, allowing for resuability across several cloud providers.
 - **VPC Endpoints:** Optimises cloud cost and enforces privellege of least-access by replacing NAT Gateways, only ensuring connectivity to other services.
-
-## Terraform State Management
-
-- **Bootstrap:** Backend is configured locally for this stage only and is used to create the infrastructure need for cross-collaboration (S3 buckets, ECR, IAM roles)
-- **Backend:** Backends for dev, staging and prod are configured remotely in seperate S3 buckets to make tracking resources easier.
-- Versioning enabled in the bucket for quick rollback and the backend is 
-
+- dry
 
 ## GitLab Flow
 
@@ -47,7 +41,20 @@ It runs on AWS Fargate, deployed via blue/green.
 
 ### Prod:
 
+## Cost Optimisation
 
+- lifecycle policies
+- vpc endpoints 
+- container images
+- tagging
+
+## Security
+
+- **Containers:**
+- **AWS S3:**
+- **Networking:** 
+- **Credential Management:**
+- **IAM:**
 
 
 ## Directory Structure
@@ -59,8 +66,19 @@ It runs on AWS Fargate, deployed via blue/green.
 └── terraform
     ├── bootstrap/
     ├── dev/
+    ├── dev/
     ├── prod/
     └── staging/
 ```
 
 ## Demo
+
+## Areas to Consider 
+
+- terraform workspaces/terragrunt
+- more reliable credential management system (hasicorp vault, AWS Secrets Manager)
+- seperate hosted zones for each env for better organisaton
+- strip down the dev environment more to save money
+- pre-commit hooks  
+- separate dbs for each env
+- closer monitoring of costs

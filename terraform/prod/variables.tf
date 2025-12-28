@@ -25,3 +25,15 @@ variable "app_count" {
 variable "dynamodb_tablename" {
   type = string
 }
+
+variable "environment" {
+    type        = string
+}
+
+variable "app_image" {
+    description = "Docker image to run in the ECS cluster"
+}
+
+variable "alb_name" {
+  type    = string
+}

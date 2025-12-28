@@ -12,3 +12,7 @@ variable "target_grb_blue_name" {
 
 variable "target_grb_green_name" {
 }
+
+variable "environment" {
+    type        = string
+}

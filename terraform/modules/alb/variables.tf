@@ -19,7 +19,6 @@ variable "forward_action" {
 
 variable "alb_name" {
   type    = string
-  default = "tm-load-balancer"
 }
 
 variable "target_type" {

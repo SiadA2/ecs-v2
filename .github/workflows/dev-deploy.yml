@@ -24,7 +24,7 @@ jobs:
     - name: Configure AWS credentials w/ OIDC
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        role-to-assume: ${{ secrets.ECR_ARN }}
+        role-to-assume: ${{ secrets.ADMIN_ROLE_ARN }}
         aws-region: eu-west-2
     
     - name: Login to Amazon ECR
@@ -35,18 +35,18 @@ jobs:
       id: build-image
       run: |
         cd app
-        docker build -t ${{ secrets.DEV_REPO }} .
-        docker tag ${{ secrets.DEV_REPO }}:latest ${{ secrets.DEV_TAG }}
+        docker build -t siada2/url-dev .
+        docker tag siada2/url-dev:latest ${{ secrets.DEV_REPO }}:${{ github.sha }}  
         
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
-        image-ref: ${{ secrets.DEV_TAG }}
+        image-ref: ${{ secrets.DEV_REPO }}:${{ github.sha }}
 
     - name: Push to Amazon ECR
       run: |
-        docker push ${{ secrets.DEV_TAG }}
+        docker push ${{ secrets.DEV_REPO }}:${{ github.sha }}
 
   
   terraform-apply:
@@ -60,7 +60,7 @@ jobs:
         - name: Configure AWS credentials w/ OIDC
           uses: aws-actions/configure-aws-credentials@v2
           with:
-            role-to-assume: ${{ secrets.ADMIN_ARN }}
+            role-to-assume: 
             aws-region: ${{ env.AWS_REGION }}
 
         - name: Run checkov scan
@@ -69,5 +69,5 @@ jobs:
         - name: Terraform apply
           run: |
             cd terraform/dev
-            terraform init -reconfigure
-            terraform apply --auto-approve -var-file="staging.tfvars" 
+            terraform init 
+            terraform apply --auto-approve -var-file="dev.tfvars" 

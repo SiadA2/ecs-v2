@@ -17,7 +17,7 @@ TASK_FAMILY="url-app-task"
 APP_NAME="example"
 DEPLOYMENT_GROUP_NAME="example"
 CONTAINER_NAME="url-app"
-CONTAINER_PORT=3000
+CONTAINER_PORT=8080
 
 echo "Creating new task definition for image: $IMAGE_URI"
 

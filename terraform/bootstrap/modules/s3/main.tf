@@ -1,32 +1,29 @@
-resource "aws_s3_bucket" "dev" {
-  bucket = "ecs-state-siad-dev"
+locals {
+  environments = ["dev", "staging", "prod"]
 }
 
-resource "aws_s3_bucket_versioning" "dev" {
-  bucket = aws_s3_bucket.dev.id
+resource "aws_s3_bucket" "buckets" {
+  for_each = toset(local.environments)
+  
+  bucket = "ecs-state-siad-${each.key}"
+}
+
+resource "aws_s3_bucket_versioning" "versioning" {
+  for_each = toset(local.environments)
+  
+  bucket = aws_s3_bucket.buckets[each.key].id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket" "staging" {
-  bucket = "ecs-state-siad-staging"
-}
+resource "aws_s3_bucket_public_access_block" "public_access_block" {
+  for_each = toset(local.environments)
+  
+  bucket = aws_s3_bucket.buckets[each.key].id
 
-resource "aws_s3_bucket_versioning" "staging" {
-  bucket = aws_s3_bucket.staging.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket" "prod" {
-  bucket = "ecs-state-siad-prod"
-}
-
-resource "aws_s3_bucket_versioning" "prod" {
-  bucket = aws_s3_bucket.prod.id
-  versioning_configuration {
-    status = "Enabled"
-  }
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
