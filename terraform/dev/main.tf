@@ -2,65 +2,117 @@ module "vpc" {
   source                   = "../modules/vpc"
   vpc_cidr                 = var.vpc_cidr
   az_count                 = var.az_count
-  endpoint_security_grp_id = module.security-grps.vpc_endpoint_security_group
+  endpoint_security_grp_id = aws_security_group.public.id
 }
 
-module "alb" {
-  source            = "../modules/alb"
-  alb_name          = var.alb_name
-  vpc_id            = module.vpc.vpc_id
-  security_groups   = module.security-grps.alb_security_group
-  public_subnets_id = module.vpc.public_subnets_id
-  certificate_arn   = module.acm.certificate_arn
-  http_port         = var.http_port
-  https_port        = var.https_port
-  app_port          = var.app_port
-}
-
-module "security-grps" {
-  source     = "../modules/security-grps"
-  vpc_id     = module.vpc.vpc_id
-  http_port  = var.http_port
-  https_port = var.https_port
-  app_port   = var.app_port
-
-}
-
-module "ecs" {
-  source                = "../modules/ecs"
-  alb_target_grp_arn    = module.alb.alb_target_grp_blue_arn
-  ecs_security_group_id = module.security-grps.ecs_security_group
-  app_port              = var.app_port
-  public_subnets_id     = module.vpc.public_subnets_id
-  app_count             = var.app_count
-  ddb_table_name        = module.dynamo_db.ddb_table_name
-  private_subnets_id    = module.vpc.private_subnets_id
-  environment           = var.environment
-  app_image             = var.app_image
-  cloudwatch_log_group  = var.cloudwatch_log_group
-  cluster_name          = var.cluster_name
-  task_family           = var.task_family
-}
-
-module "route53" {
-  source       = "../modules/route53"
-  alb_dns_name = module.alb.alb_dns_name
-  alb_zone_id  = module.alb.alb_zone_id
-  domain_name  = var.domain_name
-}
-
-module "acm" {
-  source         = "../modules/acm"
-  hosted_zone_id = module.route53.route53_hosted_zone
-  domain_name    = var.domain_name
-}
 
 module "dynamo_db" {
   source             = "../modules/dynamodb"
   dynamodb_tablename = var.dynamodb_tablename
 }
 
-module "waf" {
-  source  = "../modules/waf"
-  alb_arn = module.alb.alb_arn
+#------------------------security groups--------------------------
+
+resource "aws_security_group" "public" {
+  name        = "public-security-grp"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = var.http_port
+    to_port     = var.http_port
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = var.https_port
+    to_port     = var.https_port
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
+#------------------------dev ecs cluster-------------------------------
+
+
+resource "aws_ecs_cluster" "main" {
+    name = var.cluster_name
+}
+
+data "aws_iam_role" "task_execution_role" {
+  name = "ecsTaskExecutionRole"
+}
+
+data "aws_iam_role" "ecs_task_role" {
+  name = "ecsTaskRole"
+}
+
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = var.cloudwatch_log_group
+  retention_in_days = 7
+}
+
+resource "aws_ecs_task_definition" "app" {
+    family                   = "url-app-task-dev"
+    execution_role_arn       = data.aws_iam_role.task_execution_role.arn
+    task_role_arn            = data.aws_iam_role.ecs_task_role.arn
+    network_mode             = "awsvpc"
+    requires_compatibilities = ["FARGATE"]
+    cpu                      = var.fargate_cpu
+    memory                   = var.fargate_memory
+    container_definitions    = jsonencode([
+  {
+      "name": "url-app",
+      "image": "${var.app_image}",
+      "cpu": "${var.fargate_cpu}",
+      "memory": "${var.fargate_memory}",
+      "environment" : [{ name = "TABLE_NAME", value = var.dynamodb_tablename }],
+      "environmentFiles" : [],
+      "essential" : true,
+      "logConfiguration" : {
+        "logDriver" : "awslogs",
+        "options" : {
+          "awslogs-group" : "/ecs/task-def-dev",
+          "awslogs-region" : "eu-west-2",
+          "awslogs-stream-prefix" : "ecs"
+        },
+        "secretOptions" : []
+      },
+      "mountPoints" : [],
+      "portMappings" : [
+        {
+          "appProtocol" : "http",
+          "containerPort" : "${var.app_port}",
+          "hostPort" : "${var.app_port}"
+          "name" : "app-port",
+          "protocol" : "tcp"
+        }
+      ],
+      "systemControls" : [],
+      "ulimits" : [],
+      "volumesFrom" : []
+    }
+])
+}
+
+resource "aws_ecs_service" "main" {
+    name            = "cb-service"
+    cluster         = aws_ecs_cluster.main.id
+    task_definition = aws_ecs_task_definition.app.arn
+    desired_count   = var.app_count
+    launch_type     = "FARGATE"
+
+    network_configuration {
+        security_groups  = [aws_security_group.public.id]
+        subnets          = module.vpc.public_subnets_id
+        assign_public_ip = true
+    }
+}
+

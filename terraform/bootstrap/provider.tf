@@ -32,7 +32,7 @@ resource "cloudflare_dns_record" "ecs" {
 
 resource "cloudflare_dns_record" "dev" {
   count = 4
-  name = "ecs"
+  name = "dev"
   zone_id = var.zone_id
   ttl     = "600"
   type    = "NS"
@@ -41,7 +41,7 @@ resource "cloudflare_dns_record" "dev" {
 
 resource "cloudflare_dns_record" "staging" {
   count = 4
-  name = "ecs"
+  name = "staging"
   zone_id = var.zone_id
   ttl     = "600"
   type    = "NS"

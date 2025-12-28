@@ -17,11 +17,3 @@ output "alb_arn" {
 output "alb_listener_arn" {
   value = [aws_alb_listener.https.arn]
 }
-
-output "alb_target_grp_green_name" {
-  value = aws_alb_target_group.green.name
-}
-
-output "alb_target_grp_blue_name" {
-  value = aws_alb_target_group.blue.name
-}

@@ -15,6 +15,7 @@ module "alb" {
   http_port         = var.http_port
   https_port        = var.https_port
   app_port          = var.app_port
+  target_grp_blue_name = var.target_grp_blue_name
 }
 
 module "security-grps" {

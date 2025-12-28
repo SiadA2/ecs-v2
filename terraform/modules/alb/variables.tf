@@ -46,3 +46,6 @@ variable "http_port" {
 
 variable "https_port" {
 }
+
+variable "target_grp_blue_name" {
+}

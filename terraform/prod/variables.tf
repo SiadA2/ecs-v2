@@ -62,3 +62,7 @@ variable "cloudwatch_log_group" {
 variable "task_family" {
   default = "url-app-task"
 }
+
+variable "target_grp_blue_name" {
+  default = "target-grp-blue"
+}

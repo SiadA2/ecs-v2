@@ -41,11 +41,6 @@ variable "app_image" {
     default     = "338235305910.dkr.ecr.eu-west-2.amazonaws.com/siada2/url-staging:latest" 
 }
 
-variable "alb_name" {
-  type    = string
-  default = "staging-alb"
-}
-
 variable "vpc_cidr" {
   type    = string
   default = "172.16.0.0/16"
@@ -62,3 +57,14 @@ variable "cloudwatch_log_group" {
 variable "task_family" {
   default = "task-def-staging"
 }
+
+variable "fargate_cpu" {
+    description = "Fargate instance CPU units to provision (1 vCPU = 1024 CPU units)"
+    default = 1024
+}
+
+variable "fargate_memory" {
+    description = "Fargate instance memory to provision (in MiB)"
+    default = 2048
+}
+
