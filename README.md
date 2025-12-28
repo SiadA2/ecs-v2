@@ -15,7 +15,11 @@
 - [Overview](#overview)
 - [Key Features](#vision)
 - [GitLab Flow](#gitlab-flow)
+- [Cost Optimisation](#directory-structure)
+- [Security](#directory-structure)
 - [Directory Structure](#directory-structure)
+- [Demo](#demo)
+- [Areas to consider](#areas-to-consider)
 
 
 ## Overview
@@ -46,6 +50,9 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy and the deploy
     <img src="./images/dev-diagram.png" width="300" />
 </div>
 
+- Environment is deliberately kept minimal to allow developers to run their code on a remote environment seamlessly
+- Infrastructure is always being spun up/torn down at this stage, so any complexity is unecessary here
+
 ### Staging: 
 
 <div>
@@ -53,12 +60,27 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy and the deploy
      <img src="./images/staging-test.png" width="300" />
 </div>
 
+- An almost-identical environment to production is set up. This is because this environment serves as the testing area for other teams to catch errors before they're shipped to production.
+- I've created an ec2 instance which acts as a "bastion host" and can confirm metrics such as network connectivity.
+
+### Production
+
+<div>
+    <img src="./images/prod.png" />
+</div>
+
+- This is the app that will be served to users
+- The app only actually runs on the backend, so I've created a UI that can confirm that everything's up.
 
 ### CodeDeploy: 
 
 <div>
     <img src="./images/codedeploy.png" />
 </div>
+
+1. Replacement task set is spun up
+2. Traffic is re-routed to the new task
+3. Old task/s are terminated
 
 ## Cost Optimisation
 
@@ -72,7 +94,7 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy and the deploy
 - **AWS S3:** Blocked public access to the S3 bucket. Bucket contains the remote state which contains sensitive information and must be kept hidden. 
 - **Networking:** VPC Endpoints ensure tasks only exit the VPC to access other resources rather than the providing direct internet access to the internet
 - **Credential Management:** Sensitive info stored in .tfvars files and placed in .gitignore. This must not be committed on any circumstance
-- **IAM:**
+- **IAM:** Least-access privellege applied to RBAC-based services, such as S3, OIDC and ECS, ensuring only the necesary permissions to carry out the role are carried out
 
 
 ## Directory Structure
