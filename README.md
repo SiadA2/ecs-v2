@@ -40,18 +40,32 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy and the deploy
 2. When developers are happy with their code, PRs are raised to the ```main``` branch. This triggers build & deploy workflows for the staging environment, allowing other teams to accurately test & review code.
 3. On successful review, ```feature``` branches are merged to ```main```, triggering the final build & deploy workflows for production.
 
-### Dev:
+### Dev: 
 
-### Staging:
+<div>
+    <img src="./images/dev-pipeline.png" width="300" />
+    <img src="./images/dev-diagram.png" width="300" />
+</div>
 
-### Prod:
+### Staging: 
+
+<div>
+    <img src="./images/staging-pipeline.png" width="300" />
+     <img src="./images/staging-test.png" width="300" />
+</div>
+
+
+### CodeDeploy: 
+
+<div>
+    <img src="./images/codedeploy.png" />
+</div>
 
 ## Cost Optimisation
 
 - **Lifecycle Policies:** Policies in Amazon ECR repositories provides framworks on how to discard of old/unused images.
 - **Docker images:** Images are as minimal as possible, through multistage builds and distroless base images. Amazon charges for storage usage, so minimal size alongside lifecycle policies allow us to save costs.
-- **VPC Endpoints:** 
-- **Tagging:**
+- **VPC Endpoints:** NAT Gateways can become costly to manage, especially with elastic ips at play. VPC Endpoints removes this overhead through gateway endpoints which are free
 
 ## Security
 
@@ -87,8 +101,7 @@ Then go to ```ecs.nginxsiad.com/{short_id}```
 
 ## Areas to Consider 
 
-- **Keeping code DRY:** Consider using Terragrunt/Terraform Workspaces to reduce repeated code
+- **Keeping code DRY:** Consider using Terragrunt/Terraform Workspaces to reduce repeated code.
 - **Credential Management:** Use secrets managers such as AWS Secrets Manager / HashiCorp Vault
-- **Minimalist dev envionment:**
-- **Pre-commit hooks:**
-- **Dbs for each environment:** 
+- **Pre-commit hooks:** Helps catch syntax errors/bad code to save devs time before pushing their changes
+- **Automated teardown scripts:** Tear down infrastructure before it eats up the cloud bill
