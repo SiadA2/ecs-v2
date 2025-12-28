@@ -60,5 +60,6 @@ jobs:
         - name: Trigger CodeDeploy Deployment
           id: deployment
           run: |
-            chmod +x /codedeploy/deploy.sh
+            cd codedeploy
+            chmod +x deploy.sh
             ./codedeploy/deploy.sh ${{ secrets.PROD_REPO }}:${{ github.sha }}
