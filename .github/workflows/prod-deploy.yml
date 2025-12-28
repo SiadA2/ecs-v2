@@ -42,7 +42,7 @@ jobs:
       run: |
         docker push ${{ secrets.PROD_REPO }}:${{ github.sha }}
 
-  codedeploy:
+  deploy:
     runs-on: ubuntu-24.04
     needs: build
 
@@ -60,4 +60,5 @@ jobs:
         - name: Trigger CodeDeploy Deployment
           id: deployment
           run: |
+            chmod +x /codedeploy/deploy.sh
             ./codedeploy/deploy.sh ${{ secrets.PROD_REPO }}:${{ github.sha }}
