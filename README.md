@@ -1,15 +1,20 @@
-# ECS URL-Shortener
+<h1 align="center">ECS URL-Shortener</h1>
 
-![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=flat&logo=terraform&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazon-aws&logoColor=white)
+<div align="center">
+<img src="https://img.shields.io/badge/Terraform-7B42BC?style=flat&logo=terraform&logoColor=white" alt="Terraform">
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker">
+<img src="https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazon-aws&logoColor=white" alt="AWS">
+</div>
 
+<div align="center">
+    <img src="./images/ecs-v2.png" />
+</div>
  
 ## Contents
 
 - [Overview](#overview)
 - [Key Features](#vision)
-- [GitLab Flow](#branching-strategies)
+- [GitLab Flow](#gitlab-flow)
 - [Directory Structure](#directory-structure)
 
 
@@ -17,7 +22,7 @@
 
 This is an end-to-end, multi-cloud deployment of a URL-shortener. This URL-shortener takes a long url, shortens it and stores the shortened url in DynamoDB to be reused. 
 
-It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy.
+It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy and the deployment spans 3 Availability-Zones, with load-balancing strategies implemented.
 
 
 ## Key features
@@ -27,7 +32,7 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy.
 - **Open ID Connect (OIDC):** Replaces long-lived access keys and removes the risk of credential-based attacks. Also enforces privellege of least-access.
 - **Cloud-native DNS:** Root domain handled by CloudFlare with subdomain delegation to Amazon Route 53, allowing for resuability across several cloud providers.
 - **VPC Endpoints:** Optimises cloud cost and enforces privellege of least-access by replacing NAT Gateways, only ensuring connectivity to other services.
-- dry
+- **DRY:** Terraform modules are created once and called multiple times, demostrating good use of DRY 
 
 ## GitLab Flow
 
@@ -43,17 +48,17 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy.
 
 ## Cost Optimisation
 
-- lifecycle policies
-- vpc endpoints 
-- container images
-- tagging
+- **Lifecycle Policies:** Policies in Amazon ECR repositories provides framworks on how to discard of old/unused images.
+- **Docker images:** Images are as minimal as possible, through multistage builds and distroless base images. Amazon charges for storage usage, so minimal size alongside lifecycle policies allow us to save costs.
+- **VPC Endpoints:** 
+- **Tagging:**
 
 ## Security
 
-- **Containers:**
-- **AWS S3:**
-- **Networking:** 
-- **Credential Management:**
+- **Containers:** Containers run as non-root users to prevent sudo access to attackers
+- **AWS S3:** Blocked public access to the S3 bucket. Bucket contains the remote state which contains sensitive information and must be kept hidden. 
+- **Networking:** VPC Endpoints ensure tasks only exit the VPC to access other resources rather than the providing direct internet access to the internet
+- **Credential Management:** Sensitive info stored in .tfvars files and placed in .gitignore. This must not be committed on any circumstance
 - **IAM:**
 
 
@@ -73,12 +78,17 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy.
 
 ## Demo
 
+```bash
+curl -X POST https://ecs.nginxsiad.com/shorten \                                                     
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://youtube.com"}'
+```
+Then go to ```ecs.nginxsiad.com/{short_id}```
+
 ## Areas to Consider 
 
-- terraform workspaces/terragrunt
-- more reliable credential management system (hasicorp vault, AWS Secrets Manager)
-- seperate hosted zones for each env for better organisaton
-- strip down the dev environment more to save money
-- pre-commit hooks  
-- separate dbs for each env
-- closer monitoring of costs
+- **Keeping code DRY:** Consider using Terragrunt/Terraform Workspaces to reduce repeated code
+- **Credential Management:** Use secrets managers such as AWS Secrets Manager / HashiCorp Vault
+- **Minimalist dev envionment:**
+- **Pre-commit hooks:**
+- **Dbs for each environment:** 
