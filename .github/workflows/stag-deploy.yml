@@ -33,7 +33,7 @@ jobs:
       id: build-image
       run: |
         cd app
-        docker build -t siada2/staging .
+        docker build -t siada2/url-staging .
         docker tag siada2/url-staging:latest ${{ secrets.STAGING_REPO }}:latest
         
     
