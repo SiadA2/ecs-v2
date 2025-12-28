@@ -35,10 +35,28 @@ jobs:
       id: build-image
       run: |
         cd app
-        docker build -t  .
-        docker tag  
+        docker build -t siada2/url-prod .
+        docker tag siada2/url-prod:latest ${{ secrets.PROD_REPO }}:${{ github.sha }}
 
     - name: Push to Amazon ECR
       run: |
         docker push 
 
+  codedeploy:
+    runs-on: ubuntu-24.04
+
+    steps:
+
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Configure AWS credentials w/ OIDC
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            role-to-assume: ${{ secrets.ADMIN_ROLE_ARN }}
+            aws-region: ${{ env.AWS_REGION }}
+
+        - name: Trigger CodeDeploy Deployment
+          id: deployment
+          run: |
+            ./codedeploy/deploy.sh
