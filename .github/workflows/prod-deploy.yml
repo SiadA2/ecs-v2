@@ -62,4 +62,4 @@ jobs:
           run: |
             cd codedeploy
             chmod +x deploy.sh
-            ./codedeploy/deploy.sh ${{ secrets.PROD_REPO }}:${{ github.sha }}
+            ./deploy.sh ${{ secrets.PROD_REPO }}:${{ github.sha }}
