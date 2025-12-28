@@ -1,5 +1,6 @@
 module "vpc" {
   source                   = "../modules/vpc"
+  vpc_cidr                 = var.vpc_cidr
   az_count                 = var.az_count
   endpoint_security_grp_id = module.security-grps.vpc_endpoint_security_group
 }

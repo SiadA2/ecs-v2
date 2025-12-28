@@ -6,6 +6,7 @@ module "vpc" {
 
 module "alb" {
   source            = "../modules/alb"
+  alb_name          = var.alb_name
   vpc_id            = module.vpc.vpc_id
   security_groups   = module.security-grps.alb_security_group
   public_subnets_id = module.vpc.public_subnets_id
@@ -34,6 +35,7 @@ module "ecs" {
   ddb_table_name        = module.dynamo_db.ddb_table_name
   private_subnets_id    = module.vpc.private_subnets_id
   environment           = var.environment
+  app_image             = var.app_image
 }
 
 module "route53" {

@@ -13,21 +13,26 @@ variable "https_port" {
 
 variable "domain_name" {
   type = string
+  default = "staging.nginxsiad.com"
 }
 
 variable "app_port" {
   type = number
+  default = 8080
 }
 
 variable "app_count" {
+  default = 3
 }
 
 variable "dynamodb_tablename" {
   type = string
+  default = "staging-table"
 }
 
 variable "environment" {
     type        = string
+    default     = "staging"
 }
 
 variable "app_image" {
