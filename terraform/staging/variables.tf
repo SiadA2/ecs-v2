@@ -1,4 +1,5 @@
 variable "az_count" {
+  default = 3
 }
 
 variable "http_port" {
@@ -37,8 +38,15 @@ variable "environment" {
 
 variable "app_image" {
     description = "Docker image to run in the ECS cluster"
+    default     = "338235305910.dkr.ecr.eu-west-2.amazonaws.com/siada2/url-staging:latest" 
 }
 
 variable "alb_name" {
   type    = string
+  default = "staging-alb"
+}
+
+variable "vpc_cidr" {
+  type    = string
+  default = "172.16.0.0/16"
 }
