@@ -35,25 +35,24 @@ NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://new-
 
 echo "New task definition ARN: $NEW_TASK_DEF_ARN"
 
-# Create appspec.yaml
-cat > appspec.yaml << EOF
-version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::ECS::Service
-      Properties:
-        TaskDefinition: $NEW_TASK_DEF_ARN
-        LoadBalancerInfo:
-          ContainerName: $CONTAINER_NAME
-          ContainerPort: $CONTAINER_PORT
+# Create deployment.json
+cat > deployment.json << EOF
+{
+  "applicationName": "$APP_NAME",
+  "deploymentGroupName": "$DEPLOYMENT_GROUP_NAME",
+  "revision": {
+    "revisionType": "AppSpecContent",
+    "appSpecContent": {
+      "content": "version: 0.0\nResources:\n  - TargetService:\n      Type: AWS::ECS::Service\n      Properties:\n        TaskDefinition: $NEW_TASK_DEF_ARN\n        LoadBalancerInfo:\n          ContainerName: $CONTAINER_NAME\n          ContainerPort: $CONTAINER_PORT"
+    }
+  }
+}
 EOF
 
 # Create CodeDeploy deployment
 echo "Creating CodeDeploy deployment..."
 DEPLOYMENT_ID=$(aws deploy create-deployment \
-    --application-name $APP_NAME \
-    --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-    --revision revisionType=AppSpecContent,appSpecContent="$(cat appspec.yaml | jq -Rs .)" \
+    --cli-input-json file://deployment.json \
     --region $REGION \
     --query 'deploymentId' --output text)
 
@@ -75,4 +74,4 @@ done
 echo "Deployment completed with status: $STATUS"
 
 # Cleanup
-rm -f current-task-def.json new-task-def.json appspec.yaml
+rm -f current-task-def.json new-task-def.json deployment.json
