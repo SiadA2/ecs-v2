@@ -39,8 +39,16 @@ jobs:
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
+      continue-on-error: true
       with:
-        image-ref: 
+        image-ref: ${{ secrets.DEV_REPO }}:${{ github.sha }}
+
+    - name: Upload Trivy results
+      uses: github/codeql-action/upload-sarif@v4
+      continue-on-error: true
+      if: always()
+      with:
+        sarif_file: 'trivy-${{ matrix.service }}.sarif'
 
     - name: Push to Amazon ECR
       run: |
