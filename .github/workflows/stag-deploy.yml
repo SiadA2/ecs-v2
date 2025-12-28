@@ -12,7 +12,7 @@ env:
   AWS_REGION: eu-west-2                       
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-24.04
 
     steps:
@@ -33,8 +33,8 @@ jobs:
       id: build-image
       run: |
         cd app
-        docker build -t  .
-        docker tag 
+        docker build -t siada2/staging .
+        docker tag siada2/url-staging:latest ${{ secrets.STAGING_REPO }}:latest
         
     
     - name: Run Trivy vulnerability scanner
@@ -43,19 +43,13 @@ jobs:
       with:
         image-ref: ${{ secrets.DEV_REPO }}:${{ github.sha }}
 
-    - name: Upload Trivy results
-      uses: github/codeql-action/upload-sarif@v4
-      continue-on-error: true
-      if: always()
-      with:
-        sarif_file: 'trivy-${{ matrix.service }}.sarif'
-
     - name: Push to Amazon ECR
       run: |
-        docker push 
+        docker push ${{ secrets.STAGING_REPO }}:latest
 
-  terraform-apply:
+  deploy:
     runs-on: ubuntu-24.04
+    needs: build
 
     steps:
 
@@ -72,7 +66,7 @@ jobs:
           uses: bridgecrewio/checkov-action@v12
 
         - name: Terraform apply
-          run: |
-            cd terraform/staging
-            terraform init 
-            terraform apply --auto-approve -var-file="staging.tfvars" 
+          uses: dflook/terraform-apply@v2
+          with:
+            path: terraform/staging
+            auto_approve: true
