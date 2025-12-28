@@ -49,3 +49,12 @@ variable "private_subnets_id" {
 variable "environment" {
     type        = string
 }
+
+variable "cluster_name" {
+}
+
+variable "cloudwatch_log_group" {
+}
+
+variable "task_family" {
+}

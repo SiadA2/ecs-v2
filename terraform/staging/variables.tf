@@ -50,3 +50,15 @@ variable "vpc_cidr" {
   type    = string
   default = "172.16.0.0/16"
 }
+
+variable "cluster_name" {
+  default = "url-cluster-staging"
+}
+
+variable "cloudwatch_log_group" {
+  default = "/ecs/task-def-staging"
+}
+
+variable "task_family" {
+  default = "task-def-staging"
+}

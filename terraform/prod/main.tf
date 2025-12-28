@@ -37,6 +37,9 @@ module "ecs" {
   private_subnets_id    = module.vpc.private_subnets_id
   environment           = var.environment
   app_image             = var.app_image
+  cloudwatch_log_group  = var.cloudwatch_log_group
+  cluster_name          = var.cluster_name
+  task_family           = var.task_family
 }
 
 module "route53" {

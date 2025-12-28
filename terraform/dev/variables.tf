@@ -49,3 +49,15 @@ variable "alb_name" {
 variable "vpc_cidr" {
   default = "192.168.0.0/24"
 }
+
+variable "cluster_name" {
+  default = "url-cluster-dev"
+}
+
+variable "cloudwatch_log_group" {
+  default = "/ecs/task-def-dev"
+}
+
+variable "task_family" {
+  default = "url-task-dev"
+}

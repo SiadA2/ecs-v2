@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "main" {
-    name = "url-cluster"
+    name = var.cluster_name
 }
 
 data "aws_iam_role" "task_execution_role" {
@@ -11,7 +11,7 @@ data "aws_iam_role" "ecs_task_role" {
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
-  name              = "/ecs/task-def-1"
+  name              = var.cloudwatch_log_group
   retention_in_days = 7
 }
 
