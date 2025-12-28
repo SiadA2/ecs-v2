@@ -64,7 +64,7 @@ jobs:
           continue-on-error: true
 
         - name: Terraform apply
-          run: |
-            cd terraform/dev
-            terraform init 
-            terraform apply --auto-approve
+          uses: dflook/terraform-apply@v2
+          with:
+            path: terraform/dev
+            auto_approve: true
