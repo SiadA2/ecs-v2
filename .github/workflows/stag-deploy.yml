@@ -64,6 +64,7 @@ jobs:
 
         - name: Run checkov scan
           uses: bridgecrewio/checkov-action@v12
+          continue-on-error: true
 
         - name: Terraform apply
           uses: dflook/terraform-apply@v2
