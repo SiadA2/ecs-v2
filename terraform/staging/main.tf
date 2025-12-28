@@ -60,7 +60,3 @@ module "dynamo_db" {
   dynamodb_tablename = var.dynamodb_tablename
 }
 
-# module "waf" {
-#   source  = "../modules/waf"
-#   alb_arn = module.alb.alb_arn
-# }
