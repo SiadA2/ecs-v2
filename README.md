@@ -43,7 +43,6 @@ It runs on AWS Fargate, deployed via blue/green on AWS CodeDeploy and the deploy
 ### Dev: 
 
 <div>
-    <img src="./images/dev-pipeline.png" width="300" />
     <img src="./images/dev-diagram.png" width="300" />
 </div>
 
