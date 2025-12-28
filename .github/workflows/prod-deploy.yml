@@ -14,7 +14,7 @@ env:
   AWS_REGION: eu-west-2                       
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-24.04
 
     steps:
@@ -40,10 +40,11 @@ jobs:
 
     - name: Push to Amazon ECR
       run: |
-        docker push 
+        docker push ${{ secrets.PROD_REPO }}:${{ github.sha }}
 
   codedeploy:
     runs-on: ubuntu-24.04
+    needs: build
 
     steps:
 
