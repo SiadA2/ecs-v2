@@ -24,7 +24,7 @@ jobs:
     - name: Configure AWS credentials w/ OIDC
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        role-to-assume: ${{ secrets.ADMIN_ROLE_ARN }}
+        role-to-assume: ${{ secrets.ECR_ROLE_ARN }}
         aws-region: eu-west-2
     
     - name: Login to Amazon ECR
@@ -60,7 +60,7 @@ jobs:
         - name: Configure AWS credentials w/ OIDC
           uses: aws-actions/configure-aws-credentials@v2
           with:
-            role-to-assume: 
+            role-to-assume: ${{ secrets.ADMIN_ROLE_ARN }}
             aws-region: ${{ env.AWS_REGION }}
 
         - name: Run checkov scan
