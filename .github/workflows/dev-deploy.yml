@@ -36,12 +36,12 @@ jobs:
       run: |
         cd app
         docker build -t siada2/url-dev .
-        docker tag siada2/url-dev:latest ${{ secrets.DEV_REPO }}:${{ github.sha }}  
+        docker tag siada2/url-dev:latest ${{ secrets.DEV_REPO }}:latest  
         
 
     - name: Push to Amazon ECR
       run: |
-        docker push ${{ secrets.DEV_REPO }}:${{ github.sha }}
+        docker push ${{ secrets.DEV_REPO }}:latest
 
   
   terraform-apply:

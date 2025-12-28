@@ -41,7 +41,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.28.0
       continue-on-error: true
       with:
-        image-ref: ${{ secrets.DEV_REPO }}:${{ github.sha }}
+        image-ref: ${{ secrets.DEV_REPO }}:latest
 
     - name: Push to Amazon ECR
       run: |
