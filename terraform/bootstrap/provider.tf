@@ -29,21 +29,3 @@ resource "cloudflare_dns_record" "ecs" {
   type    = "NS"
   content = module.route53.prod-nameservers[count.index]
 }
-
-resource "cloudflare_dns_record" "dev" {
-  count = 4
-  name = "dev"
-  zone_id = var.zone_id
-  ttl     = "600"
-  type    = "NS"
-  content = module.route53.dev-nameservers[count.index]
-}
-
-resource "cloudflare_dns_record" "staging" {
-  count = 4
-  name = "staging"
-  zone_id = var.zone_id
-  ttl     = "600"
-  type    = "NS"
-  content = module.route53.staging-nameservers[count.index]
-}
